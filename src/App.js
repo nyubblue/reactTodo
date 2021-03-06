@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { TodoBanner } from './components/TodoBanner'
 import { TodoCreator } from './components/TodoCreator'
 import { TodoRow } from './components/TodoRow'
+import { VisibilityControl } from './components/VisibilityControl'
 
 
 export default class App extends Component {
@@ -12,7 +13,8 @@ export default class App extends Component {
       userName: 'Buyn',
       todoItem: [{ action: "Buy Flowers", done: false },
       { action: "Get Shoes", done: false },
-      { action: "Collect Tickets", done: false }]
+      { action: "Collect Tickets", done: false }],
+      showCompleted: true
     }
   }
   createNewTodo = (task) => {
@@ -29,7 +31,9 @@ export default class App extends Component {
     })
   }
 
-  todoTableGen = () => this.state.todoItem.map(item => <TodoRow callback={this.togleCheckbox} key={item.action} item={item} />)
+  todoTableGen = (doneValue) => this.state.todoItem.filter(t => t.done === doneValue)
+    .map(item => <TodoRow callback={this.togleCheckbox} key={item.action} item={item} />)
+
   render = () =>
     <div>
       <TodoBanner name={this.state.userName} tasks={this.state.todoItem} />
@@ -40,9 +44,23 @@ export default class App extends Component {
             <tr><th>Description</th><th>Done</th></tr>
           </thead>
           <tbody>
-            {this.todoTableGen()}
+            {this.todoTableGen(false)}
           </tbody>
         </table>
+        <div className="bg-secondary text-white text-center p-2">
+          <VisibilityControl description='Completed Tasks'
+            isChecked={this.state.showCompleted}
+            callback={(checked) => this.setState({ showCompleted: checked })}
+          />
+        </div>
+        {this.state.showCompleted &&
+          <table className="table table-striped table-bordered">
+            <thead>
+              <tr><th>Description</th><th>Done</th></tr>
+            </thead>
+            <tbody>{this.todoTableGen(true)}</tbody>
+          </table>
+        }
       </div>
     </div>
 }
